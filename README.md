@@ -17,4 +17,16 @@ Per some [obscure guide I found](https://www.oodlestechnologies.com/blogs/PICTUR
 Just puts the videos together. 
 
 ## Transitions
-[Doc](https://ottverse.com/crossfade-between-videos-ffmpeg-xfade-filter/)
+[Doc](https://ottverse.com/crossfade-between-videos-ffmpeg-xfade-filter/) this has a list of available transitions. 
+
+I was able to make a crossfade transition with the following command, "borrowed" from [Stack Overflow](https://video.stackexchange.com/questions/17502/concat-two-video-files-with-fade-effect-using-ffmpeg)
+
+```
+ffmpeg -i output.mp4 -i preview_video_target.mp4 -filter_complex "color=black:1920x1080:d=video1Duration+video2Duration-filterDuration[base]; [0:v]setpts=PTS-STARTPTS[v0]; [1:v]format=yuva420p,fade=in:st=0:d=filterDuration:alpha=1, setpts=PTS-STARTPTS+((video1Duration-filterDuration)/TB)[v1]; [base][v0]overlay[tmp]; [tmp][v1]overlay,format=yuv420p[fv]; [0:a][1:a]acrossfade=d=filterDuration[fa]" -map "[fv]" -map "[fa]" crossfade.mp4
+```
+
+where ```video1Duration```, ```video2Duration``` and ```filterDuration```  are just placeholders for your actual values. ```1920x1080``` can be changed as well. This managed to keep the two audio streams as well, so that's nice to know. 
+
+update: turns out the video and the audio have desynced with that command, so that's no fun
+
+TODO: try opengl transitions, and try to understand the acrossfade filter on audio. This can be done and when I figure it out it's gonna be awesome.
