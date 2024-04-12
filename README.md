@@ -156,3 +156,17 @@ ffmpeg -i Slide1_delay_inout.mp4 -i Slide2_delay_inout.mp4 -filter_complex "[0:v
 ```
 
 This one look spectacular!!
+
+### Chaining Transitions
+In theory we should be 
+
+```
+ffmpeg -i Slide1_delay_inout.mp4 -i LeectureSlides2.mov -i Clip1Web.mp4 -filter_complex "[0:v][1:v]xfade=transition=fade:duration=1:offset=13.41[x1];[x1][2:v]xfade=transition=fade:duration=1:offset=43.193[x2];[0:a][1:a]acrossfade=d=1[ax1];[ax1][2:a]acrossfade=d=1[ax2]" -map "[x2]" -map "[ax2]" -pix_fmt yuv420p chained_xfade_test.mp4
+```
+It works. beautiful <3
+Original durations:
+- Slide1_delay_inpout.mp4 V: 14.92 A: 14.41 D: 0.51
+- LeectureSlides2.mov V:31.266 A: 30.783 D: 0.483
+- Clip1Web.mp4 not important for this because it's the final video.
+
+The composite clip, denoted by the intermediate variable ```x1``` and ```ax1``` for its audio, has V: (14.92+31.266 - 1) = 45.186 A: (14.41 + 30.783 - 1) = 44.193 D: 0.993. The offset for the second xfade should thus be 44.193-1 (or in original form with no simplfying 45.186-(45.186-44.193) - 1 ). Seems this equation works perfectly for transitions. The math is relatively simple too. 
