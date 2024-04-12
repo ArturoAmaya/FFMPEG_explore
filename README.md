@@ -1,5 +1,5 @@
 # Intro
-
+Note that I'm not going to upload a single video here because the files are huge and github doesn't play nice with large files or non-text type files (everything changes all the time and the changes are huge)
 Apparently (according to Raunit), FFMPEG underlies a lot of video manipulation software. We're going to use it to edit videos for lecture generation. To that end there are a few commands we need to learn.
 
 ## Picture in picture
