@@ -112,11 +112,40 @@ Using that I found something interesting with the above mentioned files. I found
 The audio streams are consistently 0.5 sec shorter than the video. If all of that shortened time appears at the end of the clip, then that may well explain the weird offset values. If acrossfade lasts 1 sec but the clip end 0.5 before the video does, then acrossfade starts 1.5 sec before the end of the video, which is exactly the value that worked in the examples in [Delay in and Delay out](#delay-in-and-delay-out).
 
 
-TODO Friday: figure out how heygen actually builds in the delays
 
-- [ ] Make a no delay in and check the length
-- [ ] Make a no delay out and check the duration
+API:
+- [ ] Make a no delay in and delay out and check the length (audio is 0.5 sec shorter than the video)
+- [ ] Make a no delay out and delay in and check the duration (audio is 0.5 sec shorter than the video!!)
+
+Web interface. 
 - [ ] Make a no delay in or out and check the duration
-- [ ] Make a longer delay out and check the duration
+- [ ] Make a longer delay out and check the duration. (This one's interesting. 84.16 sec vs 83.9 - only a 0.26 difference. Note that the web interface uses a different voice. )
 
-If these are all consistent with the above findings we may be able to move to different transitions.
+Note that the LectureSlidesX.mp4 clips use a different voice ID. Its delay is also internally consistent. 
+LectureSlides1.mp4 -> V:14.36 A: 14.09 D: ~0.27
+LectureSlides2.mp4 -> V:32.44 A: 32.17 D: ~0.27
+
+According to this we should be able to crossfade the LectureSlides videos with a one second crossfade like so
+
+```
+ffmpeg -i LectureSlides1.mp4 -i LectureSlides2.mp4 -filter_complex "[0:v][1:v]xfade=transition=fade:duration=1:offset=13.09[v];[0:a][1:a]acrossfade=duration=1[a]" -map "[v]" -map "[a]" -pix_fmt yuv420p xfadetest.mp4
+```
+
+where offset values is (14.36-1-0.27) = 13.09
+
+Tried it and its (pretty) spot on. Remains to be seen what happens when you chain them together, whether things add up. 
+
+So it seems the desired format is:
+```
+ffmpeg -i $input1 -i $input2 -filter_complex "[0:v][1:v]xfade=transition=fade:duration=$transition_duration:offset=($input1.video.length - $transition_duration - ($input1.video.length - $input1.audio.length))[v];[0:a][1:a]acrossfade=duration=$transition_duration[a]" -map "[v]" -map "[a]" -pix_fmt yuv420p xfadetest.mp4
+```
+
+where ```$input1```, ```input2``` and ```transition_duration``` are all modifiable parameters. Let's try a different type of transition.
+
+### Slide left
+
+```
+ffmpeg -i LectureSlides1.mp4 -i LectureSlides2.mp4 -filter_complex "[0:v][1:v]xfade=transition=slideleft:duration=1:offset=13.09[v];[0:a][1:a]acrossfade=duration=1[a]" -map "[v]" -map "[a]" -pix_fmt yuv420p slidelefttest.mp4
+```
+
+Works spectacularly if I do say so myself :)
