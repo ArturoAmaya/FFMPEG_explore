@@ -148,4 +148,11 @@ where ```$input1```, ```input2``` and ```transition_duration``` are all modifiab
 ffmpeg -i LectureSlides1.mp4 -i LectureSlides2.mp4 -filter_complex "[0:v][1:v]xfade=transition=slideleft:duration=1:offset=13.09[v];[0:a][1:a]acrossfade=duration=1[a]" -map "[v]" -map "[a]" -pix_fmt yuv420p slidelefttest.mp4
 ```
 
-Works spectacularly if I do say so myself :)
+Works spectacularly if I do say so myself :\)
+Note however, that he started speaking pretty quickly. May be worth it to pad the beginning of clips that have moving transitions. It should work pretty great with clips that have delay at the beginning, like
+
+```
+ffmpeg -i Slide1_delay_inout.mp4 -i Slide2_delay_inout.mp4 -filter_complex "[0:v][1:v]xfade=transition=slideleft:duration=1:offset=13.42[v];[0:a][1:a]acrossfade=duration=1[a]" -map "[v]" -map "[a]" -pix_fmt yuv420p slidelefttest.mp4
+```
+
+This one look spectacular!!
