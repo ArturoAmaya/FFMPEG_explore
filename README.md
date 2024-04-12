@@ -169,4 +169,24 @@ Original durations:
 - LeectureSlides2.mov V:31.266 A: 30.783 D: 0.483
 - Clip1Web.mp4 not important for this because it's the final video.
 
-The composite clip, denoted by the intermediate variable ```x1``` and ```ax1``` for its audio, has V: (14.92+31.266 - 1) = 45.186 A: (14.41 + 30.783 - 1) = 44.193 D: 0.993. The offset for the second xfade should thus be 44.193-1 (or in original form with no simplfying 45.186-(45.186-44.193) - 1 ). Seems this equation works perfectly for transitions. The math is relatively simple too. 
+The composite clip, denoted by the intermediate variable ```x1``` and ```ax1``` for its audio, has V: (14.92+31.266 - 1) = 45.186 A: (14.41 + 30.783 - 1 [transition duration]) = 44.193 D: 0.993. The offset for the second xfade should thus be 44.193-1 (or in original form with no simplfying 45.186-(45.186-44.193) - 1 ). Seems this equation works perfectly for transitions. The math is relatively simple too. 
+
+
+NOTE: the pix_fmt yuv420p parameter is necessary for the resulting video to be playable be most players like quicktime. Use it for compatibility purposes. 
+
+## Side by Side
+I know how to make a PIP-style effect with a webM clip from the V1 heygen API using ffmpeg. It would be interesting to figure out how to make a side by side effect for videos - slides on one hand, avatar on the other side. An example for this is the initial video that Carlos showed us. 
+
+## Mid-speech cut
+Make mid-speech cuts from side by side or pip to avatar only compositions and vice-versa. Use Carlos's video for inspiration.
+
+## Slide transitions without avatar transitions
+Again from Carlos's video. This will probably need very detailed caption information which I hope HeyGen can provide (I'm a little scared that their captions on the website are big blocks of text as opposed to detailed line my line)
+
+Darren suggested I just apply a slide left/right transition on two copies of the same clip mid clip just that on one half there's one slide and there's another clip in the second half. Will have to look into it. 
+
+## Include other video sources
+This shouldn't be too hard, should just be an extension of the above stuff
+
+## Slide animations
+Some professors like their slides to have animations. Unsure of how many but I'm guessing it's something I should support. 
