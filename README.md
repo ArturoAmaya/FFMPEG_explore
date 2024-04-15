@@ -181,8 +181,45 @@ NOTE: the pix_fmt yuv420p parameter is necessary for the resulting video to be p
 I know how to make a PIP-style effect with a webM clip from the V1 heygen API using ffmpeg. It would be interesting to figure out how to make a side by side effect for videos - slides on one hand, avatar on the other side. An example for this is the initial video that Carlos showed us. 
 
 let's try something basic like
+
 ```
-ffmpeg -i left.mp4 -i right.mp4 -filter_complex hstack output.mp4
+ffmpeg -loop 1 -i Lecture10_3.jpg -i LectureSlides2.mov -filter_complex "hstack=shortest=1" -pix_fmt yuv420p side_by_side.mp4
+```
+
+This worked great to generate a double wide video clip. Not what we want. Preferably we want:
+
+- Same original dimensions
+- Slide size reduced but content uncut
+
+This should be achievable by adding a background and then scaling the video. 
+
+First pass places the slides on top left (as it should). 
+
+```
+ffmpeg -f lavfi -i color=c=white:s=1920x1080:r=24 -i LectureSlides1.mov -filter_complex "[0:v][1:v]overlay=shortest=1,format=yuv420p[out]" -map "[out]" -map 1:a color_background.mp4
+```
+
+Let's place it on the left but vertically scaled so it's in the middle of the new video:
+
+```
+ffmpeg -f lavfi -i color=c=blue:s=1920x1080:r=24 -i LectureSlides1.mov -filter_complex "[0:v][1:v]overlay=10:(main_h-overlay_h)/2:shortest=1,format=yuv420p[out]" -map "[out]" -map 1:a color_background.mp4
+```
+
+Let's scale it:
+```
+ffmpeg -f lavfi -i color=c=blue:s=1920x1080:r=24 -i LectureSlides1.mov -filter_complex "[1:v]scale=w=0.9*iw:h=0.9*ih[scaled_slides];[0:v][scaled_slides]overlay=10:(main_h-overlay_h)/2:shortest=1,format=yuv420p[out]" -map "[out]" -map 1:a color_background.mp4
+```
+- Avatar Clip cut or zoomed
+```
+ffmpeg -i Sidebysideclip.mp4 -filter_complex "crop=w=iw/2:h=ih-50:x=325:y=25" crop.mp4
+
+```
+- Roughly 2:1 ratio for slide to avatar
+
+Putting it all together we should get something like:
+
+```
+ffmpeg -f lavfi -i color=c=blue:s=1920x1080:r=24 -i LectureSlides1.mov -i Sidebysideclip.mp4 -filter_complex "[2:v]crop=w=iw/2:h=0.9*ih:x=325:y=0[cropped_avatar];[1:v]scale=w=0.9*iw:h=0.9*ih[scaled_slides];[0:v][scaled_slides]overlay=10:(main_h-overlay_h)/2:shortest=1[bkgnd_slides];[bkgnd_slides][cropped_avatar]overlay=main_w-overlay_w-20:(main_h-overlay_h)/2:shortest=1[out]" -map "[out]" -map 2:a side_by_side_test.mp4
 ```
 
 
