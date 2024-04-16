@@ -222,12 +222,11 @@ Putting it all together we should get something like:
 ffmpeg -f lavfi -i color=c=blue:s=1920x1080:r=24 -i LectureSlides1.mov -i Sidebysideclip.mp4 -filter_complex "[2:v]crop=w=iw/2:h=0.9*ih:x=325:y=0[cropped_avatar];[1:v]scale=w=0.9*iw:h=0.9*ih[scaled_slides];[0:v][scaled_slides]overlay=10:(main_h-overlay_h)/2:shortest=1[bkgnd_slides];[bkgnd_slides][cropped_avatar]overlay=main_w-overlay_w-20:(main_h-overlay_h)/2:shortest=1[out]" -map "[out]" -map 2:a side_by_side_test.mp4
 ```
 
-
 ## Mid-speech cut
-Make mid-speech cuts from side by side or pip to avatar only compositions and vice-versa. Use Carlos's video for inspiration.
+Make mid-speech cuts from side by side or pip to avatar only compositions and vice-versa. Use Carlos's video for inspiration. [NEEDS CAPTIONS]
 
 ## Slide transitions without avatar transitions
-Again from Carlos's video. This will probably need very detailed caption information which I hope HeyGen can provide (I'm a little scared that their captions on the website are big blocks of text as opposed to detailed line my line)
+Again from Carlos's video. This will probably need very detailed caption information which I hope HeyGen can provide (I'm a little scared that their captions on the website are big blocks of text as opposed to detailed line by line)
 
 Darren suggested I just apply a slide left/right transition on two copies of the same clip mid clip just that on one half there's one slide and there's another clip in the second half. Will have to look into it. 
 
@@ -236,3 +235,8 @@ This shouldn't be too hard, should just be an extension of the above stuff
 
 ## Slide animations
 Some professors like their slides to have animations. Unsure of how many but I'm guessing it's something I should support. 
+
+# FFProbe
+FFprobe can be used to extract information about the starting video files. 
+
+## Video stream duration
