@@ -1,0 +1,52 @@
+1
+00:00:00,000 --> 00:00:05,000
+Welcome to a script made for UCSD's online master's classes.
+
+2
+00:00:05,000 --> 00:00:09,000
+Every snippet here represents something that will be said by the avatar.
+
+3
+00:00:09,000 --> 00:00:15,000
+Whenever you want to change slides simply use two backslashes together, like so.
+
+4
+00:00:15,000 --> 00:00:17,000
+That will change the slides.
+
+5
+00:00:17,000 --> 00:00:21,000
+Slides are provided in the header individually, for now.
+
+6
+00:00:21,000 --> 00:00:26,000
+Please make sure the number of slides is the number of backslashes plus one.
+
+7
+00:00:27,000 --> 00:00:31,000
+The contents of the slides are, for now, not dynamic.
+
+8
+00:00:31,000 --> 00:00:34,000
+I don't know how to parse things yet.
+
+9
+00:00:34,000 --> 00:00:37,000
+I am still trying to learn more on the subject.
+
+10
+00:00:37,000 --> 00:00:43,000
+I can however use the basic Python string manipulation functions to streamline my process.
+
+11
+00:00:43,000 --> 00:00:46,000
+It has become too annoying to do in Postman.
+
+12
+00:00:46,000 --> 00:00:50,000
+There are few things I still have to consider.
+
+13
+00:00:50,000 --> 00:00:53,000
+The new Heygen API seems to be more possible.
+
