@@ -223,20 +223,54 @@ ffmpeg -f lavfi -i color=c=blue:s=1920x1080:r=24 -i LectureSlides1.mov -i Sideby
 ```
 
 ## Mid-speech cut
-Make mid-speech cuts from side by side or pip to avatar only compositions and vice-versa. Use Carlos's video for inspiration. [NEEDS CAPTIONS]
+Make mid-speech cuts from side by side or pip to avatar only compositions and vice-versa. Use Carlos's video for inspiration. 
+I generated caption using OpenAI's whisper model per [this guide](https://williamhuster.com/automatically-subtitle-videos/)
+
+With that we can try to do a mid-speech cut. Something like
+
+```
+ffmpeg -f lavfi -i color=c=blue:s=1280x720:r=24 -i Lecture10_3.jpg -i "Example Video AI Studio-2.mp4" -filter_complex "[2:v]trim=start=0.0:end=26.0, setpts=PTS-STARTPTS [first_half_avatar];[2:v]trim=start=26.0:end=52.24, setpts=PTS-STARTPTS [second_half_avatar];[first_half_avatar]crop=w=iw/2:h=0.7*ih:x=300:y=0[cropped_first_half_avatar];[cropped_first_half_avatar]scale=w=0.7857*iw:h=0.7857*ih[scaled_first_half_avatar];[1:v]scale=w=0.55*iw:h=0.55*ih[scaled_slides];[0:v][scaled_first_half_avatar]overlay=main_w-overlay_w-10:(main_h-overlay_h)/2:shortest=1[first_half_avatar_and_bkgnd];[first_half_avatar_and_bkgnd][scaled_slides]overlay=10:(main_h-overlay_h)/2:shortest=0[first_half];[first_half][second_half_avatar]concat=n=2:v=1 [out]" -pix_fmt yuv420p -map "[out]" -map 2:a mid_speech_cut.mp4
+```
 
 ## Slide transitions without avatar transitions
-Again from Carlos's video. This will probably need very detailed caption information which I hope HeyGen can provide (I'm a little scared that their captions on the website are big blocks of text as opposed to detailed line by line)
+Again from Carlos's video. This will probably need very detailed caption information which I hope HeyGen can provide (I'm a little scared that their captions on the website are big blocks of text as opposed to detailed line by line. Having generated captions with Veed.io I'm less worried. Seems the vatar pauses on periods for a small amount, allowing the clip to transition well). 
 
-Darren suggested I just apply a slide left/right transition on two copies of the same clip mid clip just that on one half there's one slide and there's another clip in the second half. Will have to look into it. 
+What I'm going to do is do the video transition between two slides first then scale and place on background along with the speaker. TODO working example.
 
 ## Include other video sources
-This shouldn't be too hard, should just be an extension of the above stuff
+This shouldn't be too hard, should just be an extension of the above stuff.
+TODO working example, but also need some way to get the video. I propose give me video download URL. 
 
 ## Slide animations
-Some professors like their slides to have animations. Unsure of how many but I'm guessing it's something I should support. 
+Some professors like their slides to have animations. Unsure of how many but I'm guessing it's something I should support. This is going to be ridiculously hard. I might ask for a video of the slide transitions with some kind of marker as to when they occur. Building the animations themselves may be a little beyond my abilities. 
 
 # FFProbe
 FFprobe can be used to extract information about the starting video files. 
 
 ## Video stream duration
+```
+ffprobe -v error -select_streams v:0 -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 Slide1_delay_inout.mp4
+```
+
+## Audio Stream Duration
+```
+ffprobe -v error -select_streams a:0 -show_entries stream=duration -of default=noprint_wrappers=1:nokey=1 Slide1_delay_inout.mp4
+```
+
+# Chaining commands
+Everything I've done so far has been manual. I need to figure out a way to do automatic or programmatic chaining of the commands. There are two ways, of which there is an obvious choice:
+- Do each block alone and write to the filesystem, and then combine the blocks and produce an output. PROS: easy to manage labels inside the commands. CONS: slow as ***** since there's so much read/write to the disk.
+- Figure out a way to chain them all in the commands. PROs:One command, one run. If everything works it's just one run. CON: so hard to understand once you actually write it out. Might require preprocessing. 
+
+
+Obvious choice is to do the hard work upfront and figure out a way to concat commands in the filter_complex. I think that will probably look like:
+- Parsing the text
+- Producing the relevant clips
+- Extracting timing information about the generated clips
+- Fill in the information to make compositions (i.e. sections of video without transitions)
+- Fill in the information to make transitions.
+- Put that all into one command. 
+
+I will manage a basic incrementally upgrading script parser. V0.0 can just concatenate clips through the HeyGen API. 
+
+- [ ] V0.01 Only handle full clips. Slides transition at the same time as the avatar. Fades only. Transition to docker. Run all command on CLI, not any wrapper. 
